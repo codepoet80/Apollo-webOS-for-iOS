@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Upload an archive to App Store Connect for TestFlight:
+	     xcodebuild -exportArchive -archivePath <archive> -exportOptionsPlist ExportOptions.plist -allowProvisioningUpdates -exportPath <dir> -->
+	<key>method</key>
+	<string>app-store-connect</string>
+	<key>destination</key>
+	<string>upload</string>
+	<key>teamID</key>
+	<string>Z97JEYX9UJ</string>
+	<key>signingStyle</key>
+	<string>automatic</string>
+	<key>uploadSymbols</key>
+	<true/>
+	<!-- Each upload needs a build number higher than the last. App Store Connect's own numbering
+	     reused one while the previous upload was still processing, so the archive carries its own:
+	     archive with CURRENT_PROJECT_VERSION=$(date +%y%m%d%H%M). -->
+	<key>manageAppVersionAndBuildNumber</key>
+	<false/>
+</dict>
+</plist>

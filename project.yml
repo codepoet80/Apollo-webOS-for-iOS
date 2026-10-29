@@ -1,0 +1,83 @@
+# Apollo for iOS: the webOS apps com.jmtk.apollo (iPad) and com.jmtk.apollophone (iPhone),
+# as packaged, hosted by iOSLuna's LunaKit.
+# Generate the Xcode project with `xcodegen`; Apollo.xcodeproj is not hand-edited.
+name: Apollo
+options:
+  bundleIdPrefix: org.webosarchive
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    MARKETING_VERSION: "1.2.8"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: Z97JEYX9UJ
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "5.0"
+packages:
+  LunaKit:
+    path: ../Lunacy/iOSLuna
+targets:
+  Apollo:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+    dependencies:
+      - package: LunaKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.webosarchive.apollo
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1,2"
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: App/Info.plist
+        # The build phase below reads from outside the project (the webOS app, Lunacy, the SDK).
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Apollo
+        # Export compliance, answered by the owner: no non-exempt encryption.
+        ITSAppUsesNonExemptEncryption: false
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UIRequiresFullScreen: true
+        UIStatusBarStyle: UIStatusBarStyleLightContent
+        UISupportedInterfaceOrientations~iphone:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        # Pandora keeps playing with the screen locked.
+        UIBackgroundModes:
+          - audio
+        # Apollo speaks to Pandora's tuner API over plain http, as Palm's client did, and its
+        # audio may come over http too.
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+          UISceneConfigurations:
+            UIWindowSceneSessionRoleApplication:
+              - UISceneConfigurationName: Default
+                UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
+    preBuildScripts: []
+    postCompileScripts:
+      - name: Bundle the webOS app and its runtime
+        basedOnDependencyAnalysis: false
+        script: |
+          set -e
+          DEST="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/webos"
+          mkdir -p "$DEST/apps"
+          # The apps exactly as packaged; only the repository's own notes are left out.
+          for app in com.jmtk.apollo com.jmtk.apollophone; do
+            rsync -a --delete --exclude CLAUDE.md --exclude CODE_REVIEW.md --exclude .DS_Store --exclude build \
+              "$SRCROOT/$app/" "$DEST/apps/$app/"
+          done
+          "$SRCROOT/../Lunacy/iOSLuna/assemble-assets.sh" "$DEST"
