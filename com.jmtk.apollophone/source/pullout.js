@@ -113,13 +113,26 @@ enyo.kind({
 	},
 	
 	donorsRetrieved: function( transport ) {
-		if ( transport.responseText == "" ) {
-			this.log("Empty response");
+		var data = null;
+		try {
+			if ( transport.responseText != "" ) {
+				data = enyo.json.parse(transport.responseText);
+			}
+		} catch(e) {
+			this.log("Could not parse donor list: " + e);
+		}
+		if ( !data || !data.donors ) {
+			this.donorsFailed();
 			return;
 		}
-		var data = enyo.json.parse(transport.responseText);
 		this.donors = data.donors;
 		this.$.loadingtext.hide();
+		this.$.donorList.render();
+	},
+
+	donorsFailed: function() {
+		this.donors = [];
+		this.$.loadingtext.setContent("Supporter list is not available.");
 		this.$.donorList.render();
 	},
 
@@ -138,10 +151,13 @@ enyo.kind({
 	},
 	
 	openDonors: function() {
+		this.$.loadingtext.setContent("Loading...");
+		this.$.loadingtext.show();
 		var request = new Ajax.Request( "http://cs.clemson.edu/~tkimmet/donors.json", {
 			method: "GET",
-			onSuccess: this.donorsRetrieved.bind(this)
-		});	
+			onSuccess: this.donorsRetrieved.bind(this),
+			onFailure: this.donorsFailed.bind(this)
+		});
 	}
 }
 );

@@ -7,10 +7,6 @@ enyo.kind({
 	flex:1,
 	components:[
 		{
-			kind: "Input", name: "searchInput", style: "z-index: -50; position: absolute;", onblur: "refocusInput", oninput: "startSearch",
-			autocorrect: false, autoCapitalize: "lowercase", spellcheck: false, autoWordComplete: false,
-		},
-		{
 			kind: "Popup",
 			lazy: false,
 			scrim: true,
@@ -270,13 +266,6 @@ enyo.kind({
 			this.togglePlayPauseDisplay( !AppGlobals.musicPlaying );
 		}
 		enyo.job("firstSnap", enyo.bind(this, "snapArt"), 1000);
-		enyo.job("focusInput", enyo.bind(this, "refocusInput"), 1000);
-	},
-	
-	refocusInput: function(inSender) {
-		if ( !this.searching ) { 
-			this.$.searchInput.forceFocus();
-		}
 	},
 	
 	searchResultClicked: function( inSender, inEvent ) {
@@ -322,7 +311,6 @@ enyo.kind({
 	
 	hideSearchPopup: function(inSender, inEvent) {
 		this.$.stationSearch.setValue("");
-		this.$.searchInput.setValue("");
 		this.$.searchPopup.hide();
 	},
 	
@@ -351,9 +339,7 @@ enyo.kind({
 		}
 		else {
 			this.$.stationSearch.setValue("");
-			this.$.searchInput.setValue("");
 			this.searching = false;
-			this.$.searchInput.forceFocus();
 		}
 	},
 	
@@ -371,26 +357,12 @@ enyo.kind({
 		this.$.stationSearch.forceBlur();
 	},
 	
-	startSearch: function() {
-		if ( Util.trim(this.$.searchInput.getValue()).length == 0 ) {
-			return;
-		}
-		
-		if ( !this.searching ) {
-			this.searching = true;
-			this.showSearchPopup(null, null);
-			this.$.stationSearch.setValue( Util.trim(this.$.searchInput.getValue()) );
-			this.search();
-		}
-	},
-	
 	search: function() {
 
 		if (Util.trim(this.$.stationSearch.getValue()).length == 0) {
 			this.updateList([]);
 			this.$.stationSearch.toggleSpinner(false);
 			this.$.stationSearch.setValue("");
-			this.$.searchInput.setValue("");
 			return;
 		}
 
@@ -661,7 +633,6 @@ enyo.kind({
 		this.$.bioScrollDownIndicator.hide();
 		this.$.explainScrollUpIndicator.hide();
 		this.$.explainScrollDownIndicator.hide();
-		this.refocusInput();
 		if ( !AppGlobals.musicPlaying ) {
 			enyo.job("stopMarquees", enyo.bind(this, "stopMarquees"), 200);
 		}
@@ -884,8 +855,7 @@ enyo.kind({
 			this.toggleContentsDisplay( false );
 			this.$.contentScrim.show();
 			this.$.contentSpinner.hide();
-			this.refocusInput();
-			if ( !AppGlobals.station || !AppGlobals.station.started ) {
+				if ( !AppGlobals.station || !AppGlobals.station.started ) {
 				//this.$.scrimMessage.show();
 				this.$.radioName.show();
 			}
@@ -907,8 +877,7 @@ enyo.kind({
 			this.$.currTrackArtistBox.show();
 			this.$.progressBar.show();
 			if (this.$.songInfo.showing) {
-				this.refocusInput();
-				Application.$.interface.$.whyThisArtistButton.show();
+						Application.$.interface.$.whyThisArtistButton.show();
 				Application.$.interface.$.aboutArtistButton.show();
 			}
 		}
@@ -1082,7 +1051,6 @@ enyo.kind({
 			return;
 		}
 		this.snapArt();
-		this.$.searchInput.forceFocus();
 	},
 
 	fillMarquees: function() {
@@ -1124,14 +1092,24 @@ enyo.kind({
 		this.$.currentAlbumArtContainer.applyStyle("background-image", "url('"+this.songInfo.artUrl+"');");
 	
 		/** Artist Bio **/
-		this.$.artistBio.setContent("Loading...");
 		var url = this.trackData.artistExplorerUrl;
+		if ( url ) {
+			this.$.artistBio.setContent("Loading...");
 			url = url.replace(/\/xml\//, "/json/");
 			url = url.replace(/beta.savagebeast.com:7001/, AppConstants.PANDORA_URL);
 			var request = new Ajax.Request(url, {
 				method: AppGlobals.HTTP_GET_METHOD,
-				onSuccess: this.onArtistData.bind(this)
-		});
+				onSuccess: this.onArtistData.bind(this),
+				onFailure: this.onArtistData.bind(this)
+			});
+		}
+		else {
+			// no explorer URL for this track (audio ad, or API change); don't let
+			// a TypeError here abort the rest of the track-change handling
+			this.artistInfo.bio = AppConstants.MSG_NO_ARTIST_INFO;
+			this.artistInfo.artUrl = AppConstants.defaultAlbumArt;
+			this.$.artistBio.setContent(AppConstants.MSG_NO_ARTIST_INFO);
+		}
 		
 		/** Track explanation **/
 		this.$.trackExplanation.setContent("Loading...");

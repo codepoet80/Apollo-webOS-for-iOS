@@ -33,7 +33,8 @@ var MessageDispatcher = Class.create({
 			var handlerKey = keys[index];
 			var handler = handlerMap.get(handlerKey);
 			if ( handler == undefined ) {
-				break;
+				// unsubscribed during this dispatch; keep delivering to the rest
+				continue;
 			}
 			//enyo.error("Dispatching '"+type+"' message");
 			try {

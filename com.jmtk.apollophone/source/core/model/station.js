@@ -148,24 +148,25 @@ var Station = Class.create({
 		MessageDispatcher.dispatchMessage( AppConstants.EVENT_ON_TOGGLE_SPINNER, false );
 	},
 	
+	// isPaused always mirrors the track's real state. The Track methods return
+	// the resulting paused state, so we never blindly toggle the flag: a press
+	// that lands while no track is playable (e.g. between songs) must not flip
+	// it, or the next track would start paused.
 	playIfPaused: function() {
 		if ( this.currentTrack != null ) {
-			this.currentTrack.pause();
-			this.isPaused = false;
+			this.isPaused = this.currentTrack.playIfPaused();
 		}
 	},
 
 	pause: function() {
 		if (this.currentTrack != null) {
-			this.currentTrack.pause();
-			this.isPaused = !this.isPaused;
+			this.isPaused = this.currentTrack.pause();
 		}
 	},
 
 	pauseIfPlaying: function() {
 		if (this.currentTrack != null) {
-			this.currentTrack.pauseIfPlaying();
-			this.isPaused = true;
+			this.isPaused = this.currentTrack.pauseIfPlaying();
 		}
 	},
 

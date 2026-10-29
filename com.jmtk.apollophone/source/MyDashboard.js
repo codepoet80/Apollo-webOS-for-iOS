@@ -63,13 +63,17 @@ enyo.kind({
 		if ( AppGlobals.dashProgress ) {
 			this.intervalID = setInterval( this.moveProgress.bind(this), 1000 );
 		}
-		this.updateTrackInfo( AppGlobals.station.nowplayingActiveTrackData );
+		if ( AppGlobals.station ) {
+			this.updateTrackInfo( AppGlobals.station.nowplayingActiveTrackData );
+		}
 	},
 
 	dashDeactivated: function() {
 		// this.log();
 		// Update images etc
-		this.updateTrackInfo( AppGlobals.station.nowplayingActiveTrackData );
+		if ( AppGlobals.station ) {
+			this.updateTrackInfo( AppGlobals.station.nowplayingActiveTrackData );
+		}
 		if ( this.intervalID != null ) {
 			clearInterval(this.intervalID);
 			this.intervalID = null;

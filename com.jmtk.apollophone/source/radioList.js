@@ -285,10 +285,6 @@ enyo.kind({
 		this.$.stationListScroller.scrollTo(0,0);
 	},
 	
-	hideSearchPopup: function(inSender, inEvent) {
-		this.$.searchPopup.hide();
-	},
-	
 	showSearchPopup: function( inSender, inEvent ) {
 
 		// if ( inEvent != undefined && AppGlobals.platform == "device" ) {
@@ -383,7 +379,6 @@ enyo.kind({
 								}
 
 								if (artist != null) {
-									var truncatedName = Util.truncateText(name, 32);
 									var resultAsJSON = {'artist': artist, 'song': song, 'musicToken': musicToken};
 									// enyo.log("THIS IS RESULT AS JSON: "+enyo.json.stringify(resultAsJSON));
 									results.push(resultAsJSON);
@@ -407,10 +402,6 @@ enyo.kind({
 	},
 	
 	updateList: function( newList ) {
-		if (this.searchText != null && this.searchText.length > 0) {
-			results.push({'name':'extended search >', 'musicToken': "extended-search-token"});
-		}
-		
 		this.resultList = newList;
 		
 		this.renderResults();

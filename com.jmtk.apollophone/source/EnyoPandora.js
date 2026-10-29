@@ -16,6 +16,7 @@ enyo.kind({
 	create: function() {
 		this.inherited(arguments);
 		enyo.windows.renameWindow( window, "MainWindow" );
+		NowPlaying.start();
 		this.exhibition = false;
 		this.exhibitionLaunch = false;
 		if ( enyo.windowParams.windowType == "dockModeWindow" && enyo.windowParams.dockMode ) {
@@ -53,7 +54,9 @@ enyo.kind({
 		// this.log();
 		enyo.job.stop( "unfocus" );
 		this.hideDashboard();
-		DeviceService.hijackVolumeControls();
+		if ( DeviceService ) {
+			DeviceService.hijackVolumeControls();
+		}
 	},
 
 	winParamsChanged: function() {
@@ -63,7 +66,9 @@ enyo.kind({
 	},
 
 	unfocusAppDelay: function() {
-		DeviceService.releaseVolumeControls();
+		if ( DeviceService ) {
+			DeviceService.releaseVolumeControls();
+		}
 	//	this.log("Starting unfocusApp job");
 		enyo.job( "unfocus", enyo.bind( this, "unfocusApp" ), 400 );
 	},
@@ -142,6 +147,7 @@ enyo.kind({
 		var params = enyo.windowParams;
 		if ( params.appTimeout === true ) {
 			this.shutdown();
+			return;
 		}
 		//Check for exhibition
 		if ( params.windowType == "dockModeWindow" && params.dockMode ) {

@@ -7,16 +7,17 @@ var Header = {
 		kind:"pageHeader", pack:"center", align:"center",
 		components:[
 			//{kind:"Image", src:"images/minilogo.png"},
-			{kind:"ToolButton", className:"", name:"whyThisArtistButton", content:"Why This Track?", onclick:"showWhyArtist",  /*height:"35px", style:"font-size:21px; line-height:31px;",*/  showing:false},
+			{kind:"ToolButton", className:"", name:"whyThisArtistButton", content:"?", style:"min-width:36px; font-weight:bold;", onclick:"showWhyArtist",  /*height:"35px", style:"font-size:21px; line-height:31px;",*/  showing:false},
 			{kind: "ToolButton", className:"", name:"backFromInfo", content:"Back",  /*height:"35px", style:"font-size:21px; line-height:31px;",*/ onclick:"backToMain", showing:false},
 			{flex:1},
 			{
 				kind: "customSelector", name:"radioName", hideArrow:false, disabled:false, showing: false,
 				style: "font-size: 16px; margin-top: 0px; margin-right:12px;", value: 0, onDelete: "deleteStation", onSelect: "setStation", popupAlign: "right",
+				onclick: "toggleStationList",
 				items: AppGlobals.stationList
 			},
 			{flex:1},
-			{kind:"ToolButton", className:"", name:"aboutArtistButton",  /*height:"35px", style:"font-size:21px; line-height:31px;",*/  content:"About Artist", onclick:"showAboutArtist", showing:false}
+			{kind:"ToolButton", className:"", name:"aboutArtistButton",  /*height:"35px", style:"font-size:21px; line-height:31px;",*/  content:"i", style:"min-width:36px; font-family:Georgia,serif; font-style:italic; font-weight:bold;", onclick:"showAboutArtist", showing:false}
 		]
 };
 
@@ -146,9 +147,15 @@ enyo.kind({
 		},
 
 
-		{kind:"Pane", name:"viewPane", flex:1, components:[
-			{kind: "phoneMain", onback:"backToMain", name:"phoneMain"},
-			{kind: "pullout", name:"pullout", onBackMain:"backToMain", onBack:"backToMain", onImagePick: "changeBackgroundImage", onImagePickCustom: "changeCustomBackgroundImage", showing:false},
+		{kind:"SlidingPane", name:"stationPane", flex:1, style:"width:100%;", components:[
+			{kind:"radioList", name:"radioList", width:"260px", fixedWidth: true, dragAnywhere: false, edgeDragging: false, showing: false},
+			// Only the left edge drags the main view: its own swipes skip and show history.
+			{name:"mainView", flex:1, dragAnywhere: false, edgeDragging: true, layoutKind:"VFlexLayout", components:[
+				{kind:"Pane", name:"viewPane", flex:1, components:[
+					{kind: "phoneMain", onback:"backToMain", name:"phoneMain"},
+					{kind: "pullout", name:"pullout", onBackMain:"backToMain", onBack:"backToMain", onImagePick: "changeBackgroundImage", onImagePickCustom: "changeCustomBackgroundImage", showing:false},
+				]}
+			]}
 		]},
 		
 		introPopup,
@@ -157,7 +164,21 @@ enyo.kind({
 		registerPopup
 	],
 
+	create: function() {
+		this.inherited(arguments);
+		// A Pane starts on its first view, the station list; the phone starts on its main view.
+		this.$.stationPane.selectViewByName("mainView", true);
+		// The list's top shading is the tablet panel's 210 px art; here the panel is the phone's width.
+		this.$.radioList.$.stationListScroller.applyStyle("background-size", "100% 100px");
+	},
+
+	destroy: function() {
+		MessageDispatcher.unsubscribe( AppConstants.EVENT_ON_STATION_CHANGE, this.stationChangeCallbackId );
+		this.inherited(arguments);
+	},
+
 	ready: function() {
+		this.stationChangeCallbackId = MessageDispatcher.subscribe( AppConstants.EVENT_ON_STATION_CHANGE, this.hideStationList.bind(this) );
 		
 		if (AppGlobals.orientation) {
 			enyo.setAllowedOrientation("up");
@@ -186,17 +207,6 @@ enyo.kind({
 		else {
 			this.setRadioList();
 			this.setRadioName();
-		}
-		var d = new Date().getDay();
-		if (AppGlobals.devStatistics && (d == 2 || d == 6)) {
-			var quality = "High";
-			if (AppGlobals.audioQuality == 1) {
-				quality = "Low";
-			} else if (AppGlobals.audioQuality == 2) {
-				quality = "Medium";
-			}
-		
-			villo.webLog(AppGlobals.villoUsername+" - Device Type: "+AppGlobals.deviceInfo.modelNameAscii+" -  Audio Quality: "+quality+" - Background: "+AppGlobals.backgroundUrl+" - Auto play: "+AppGlobals.startupAutoPlay+" - Orientation lock: "+AppGlobals.orientation);
 		}
 	},
 	
@@ -287,6 +297,29 @@ enyo.kind({
 		Api.deleteStation(stationData.stationToken, new DeleteStationDelegate(stationData.stationToken, this));
 	},
 	
+	// The header's station name: slide the station list out, or back in. Returns true so the
+	// selector doesn't also open its own popup. Side by side, the list is already showing.
+	toggleStationList: function() {
+		var pane = this.$.stationPane;
+		if ( !pane.multiView ) {
+			pane.selectViewByName( pane.getViewName() == "radioList" ? "mainView" : "radioList" );
+		}
+		return true;
+	},
+
+	// A station was chosen (from the list or anywhere else): back to what's playing.
+	hideStationList: function() {
+		var pane = this.$.stationPane;
+		if ( !pane.multiView && pane.getViewName() == "radioList" ) {
+			pane.selectViewByName("mainView");
+		}
+	},
+
+	resizeHandler: function() {
+		this.inherited(arguments);
+		this.$.stationPane.resize();
+	},
+
 	windowRotated: function(inSender) {
 		if ( this.popupStack && this.popupStack.length > 0 ) {
 			this.popupStack[this.popupStack.length-1].close();
@@ -348,6 +381,7 @@ enyo.kind({
 			//this.$.menuButton.setDisabled(true);
 			this.$.radioName.disabled = false;
 			this.$.radioName.setHideArrow(false);
+			this.$.radioList.updateView();
 			this.$.viewPane.getView().snapArt();
 	//		if (this.$.primaryInterface) {
 	//			this.$.primaryInterface.$.contentPage.unsubscribe();
@@ -500,10 +534,7 @@ enyo.kind({
 	},
 	
 	finishSignOut: function() {
-		for ( var c in this.$ ) {
-			if ( c.destroy )
-				c.destroy();
-		}
+		// destroy() tears down all child components
 		this.destroy();
 		Application.setView("interface");
 	},

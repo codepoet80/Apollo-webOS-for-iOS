@@ -179,6 +179,12 @@ var Track = Class.create({
 
     validateAudioUrlCallback: function(status, contentLength, audioUrl) {
         Util.log("audio url head status: " + status);
+        if (this.stopped) {
+            // Skipped or stopped while its URL was being checked: the audio element now belongs
+            // to another track, and setting its src would cut that track off.
+            this.log("ignoring audio url check for a stopped track");
+            return;
+        }
         this.contentLength = contentLength;
 
         if (status == 200 || status == 206) {
@@ -218,6 +224,10 @@ var Track = Class.create({
         }
 
         MessageDispatcher.dispatchMessage(AppConstants.EVENT_ON_DISABLE_CONTROLS, true);
+
+        // A HEAD request still in flight must not hand this track's audio to the pool's element
+        // after it has gone to the next track (validateAudioUrlCallback checks this).
+        this.stopped = true;
 
         if (this.monitorId != null) {
             clearInterval(this.monitorId);
@@ -277,47 +287,79 @@ var Track = Class.create({
         MessageDispatcher.dispatchMessage(AppConstants.EVENT_ON_PLAY_PROGRESS, this.timeObject);
     },
 
+    // Toggles play/pause. Returns true if the track is now paused, false if it
+    // is now playing. If nothing could be done (track not started / not playable)
+    // the current state is returned so callers stay in sync with reality.
     pause: function() {
-        if (!this.started) return;
-        if (!this.isPlayable()) return;
+        if (!this.started) return this.paused;
+        if (!this.isPlayable()) return this.paused;
 
         try {
             if (this.paused) {
                 this.player.play();
                 AppGlobals.musicPlaying = true;
+                return false;
             } else {
                 this.player.pause();
                 AppGlobals.musicPlaying = false;
+                return true;
             }
         } catch(e) {
             this.log("Error pausing the audio player: " + e);
             this.playable = false;
+            return this.paused;
         }
     },
 
+    // Returns true if the track is now paused.
     pauseIfPlaying: function() {
-        if (!this.started) return;
-        if (!this.isPlayable()) return;
+        if (!this.started) return this.paused;
+        if (!this.isPlayable()) return this.paused;
 
         try {
             if (!this.paused) {
                 this.player.pause();
+                AppGlobals.musicPlaying = false;
             }
+            return true;
         } catch(e) {
             this.log("Error pausing the audio player: " + e);
             this.playable = false;
+            return this.paused;
+        }
+    },
+
+    // Returns true if the track is still paused, false if it is now playing.
+    playIfPaused: function() {
+        if (!this.started) return this.paused;
+        if (!this.isPlayable()) return this.paused;
+
+        try {
+            if (this.paused) {
+                this.player.play();
+                AppGlobals.musicPlaying = true;
+            }
+            return false;
+        } catch(e) {
+            this.log("Error resuming the audio player: " + e);
+            this.playable = false;
+            return this.paused;
         }
     },
 
     calculateVolume: function() {
+        // Always compute from full volume: the audio element is recycled between
+        // tracks (and may have been muted by the restart-while-paused path), so
+        // multiplying by the current volume would compound across tracks.
+        var volume = 1;
         if (this.trackData.trackGain != null) {
             var gain = Number(this.trackData.trackGain);
-            var adjustedVolume = Math.pow(10, gain / 20) * this.player.volume;
-            if (adjustedVolume <= 1) {
-                this.player.volume = adjustedVolume;
-                this.log("adjusted volume: " + adjustedVolume);
+            if (!isNaN(gain)) {
+                volume = Math.min(1, Math.pow(10, gain / 20));
             }
         }
+        this.player.volume = volume;
+        this.log("adjusted volume: " + volume);
     },
 
     monitorProgress: function() {
@@ -469,8 +511,8 @@ var Track = Class.create({
 
                 if (this.station.isPaused) {
                     this.log("pausing track. track was restarted during a pause state");
-                    this.pause();
-                    this.station.isPaused = false;
+                    // Keep the station flag in sync with what the track actually did.
+                    this.station.isPaused = this.pause();
                 }
 
                 this.calculateVolume();

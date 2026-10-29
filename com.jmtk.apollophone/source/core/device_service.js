@@ -110,6 +110,10 @@ enyo.kind({
 		AppGlobals.isInternetAvailable = inResponse.isInternetConnectionAvailable;
 
 		Util.log("Is internet available: " + inResponse.isInternetConnectionAvailable);
+
+		if (AppGlobals.isInternetAvailable && AppGlobals.station != null) {
+			AppGlobals.station.playlistService.networkAvailable();
+		}
 	},
 
 	onMediaEvent: function(inSender, inResponse) {

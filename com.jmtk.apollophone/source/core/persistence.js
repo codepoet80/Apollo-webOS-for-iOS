@@ -20,7 +20,6 @@ var Persistence = Class.create({
 
     restore: function() {
 		Util.log("Restoring Persistence...");
-		this.depot.get(AppGlobals.DB_KEY_STATISTICS, this.onGetStatistics.bind(this), this.onError);
         this.depot.get(AppGlobals.DB_KEY_USERNAME, this.onGetUsername, this.onError);
         this.depot.get(AppGlobals.DB_KEY_STATION_LIST_CHECKSUM, this.onGetStationListChecksum, this.onError);
 				
@@ -29,7 +28,6 @@ var Persistence = Class.create({
 		this.depot.get(AppGlobals.DB_KEY_TEXT_BACKING, this.onGetTextBacking.bind(this), this.onError);		
 		this.depot.get(AppGlobals.DB_KEY_ORIENTATION, this.onGetOrientation.bind(this), this.onError);
 		this.depot.get(AppGlobals.DB_KEY_EXHIBITION, this.onGetExhibition.bind(this), this.onError);
-		this.depot.get(AppGlobals.DB_KEY_STATISTICS, this.onGetStatistics.bind(this), this.onError);
 		this.depot.get(AppGlobals.DB_KEY_AUTO_PLAY, this.onGetStartupAutoPlay.bind(this), this.onError);
 		
 		this.depot.get(AppGlobals.DB_KEY_DASH_PROGRESS, this.onGetDashProgress.bind(this), this.onError);
@@ -130,7 +128,9 @@ var Persistence = Class.create({
         }
     },
 
-    removeAll: function() {
+    // Clears the persisted store. The Depot is asynchronous, so callers that
+    // need to read from it afterwards must wait for onComplete.
+    removeAll: function(onComplete) {
 		Util.log("Starting to remove all from DB");
         // if (this.mojoVersion <= AppGlobals.webOS1_1) {
             // // remove got a name change in version 1.1 of WebOS
@@ -144,12 +144,23 @@ var Persistence = Class.create({
 		this.depot.remove(AppGlobals.DEFAULT_BUCKET,AppGlobals.DB_KEY_BACKGROUND_URL , this.onSuccess, this.onError);
 		this.depot.remove(AppGlobals.DEFAULT_BUCKET,AppGlobals.DB_KEY_ORIENTATION , this.onSuccess, this.onError);
 		this.depot.remove(AppGlobals.DEFAULT_BUCKET,AppGlobals.DB_KEY_EXHIBITION, this.onSuccess, this.onError);
-		this.depot.remove(AppGlobals.DEFAULT_BUCKET,AppGlobals.DB_KEY_STATISTICS, this.onSuccess, this.onError);
 		this.depot.remove(AppGlobals.DEFAULT_BUCKET,AppGlobals.DB_KEY_AUTO_PLAY , this.onSuccess, this.onError);
         this.depot.remove(AppGlobals.DEFAULT_BUCKET,AppGlobals.DB_KEY_LICENSING , this.onSuccess, this.onError);
         this.depot.remove(AppGlobals.DEFAULT_BUCKET,AppGlobals.DB_KEY_STATION, this.onSuccess, this.onError);
-		this.depot.removeAll( this.onSuccess, this.onError );
-        Util.log("done with remove all");
+		var done = function(result) {
+			this.onSuccess(result);
+			Util.log("done with remove all");
+			if (onComplete) {
+				onComplete();
+			}
+		}.bind(this);
+		var failed = function(transaction, result) {
+			this.onError(transaction, result);
+			if (onComplete) {
+				onComplete();
+			}
+		}.bind(this);
+		this.depot.removeAll( done, failed );
     },
 
     onGetDeviceId: function(result) {
@@ -175,9 +186,6 @@ var Persistence = Class.create({
     onGetUsername: function(result) {
 		Util.log("Getting persisted username: " + result);
         AppGlobals.username = result;
-		if ( result != null ) {
-			AppGlobals.villoUsername = result.split("@")[0];
-		}
     },
 
     onGetStationListSort: function(result) {
@@ -225,15 +233,7 @@ var Persistence = Class.create({
 		else {
             AppGlobals.audioQuality = result;
         }
-		
-		//Logging
-		var quality = "";
-		if (AppGlobals.audioQuality == 1) {
-			quality = "Low";
-		} else if (AppGlobals.audioQuality == 2) {
-			quality = "Medium";
-		} else {quality = "High";}
-		
+
     },
 	
 	onGetBackgroundUrl: function(result) {
@@ -265,16 +265,6 @@ var Persistence = Class.create({
 			AppGlobals.setExhibitionType(true);
 		}
 
-	},
-	
-	onGetStatistics: function(result) {
-		Util.log("Getting persisted developer statistics: " + result);
-		if (result != null) {
-			AppGlobals.setStatistics(result);
-		}
-		else {
-			AppGlobals.setStatistics(false);
-		}
 	},
 	
 	onGetStartupAutoPlay: function(result) {

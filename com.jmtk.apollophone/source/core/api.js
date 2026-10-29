@@ -400,7 +400,7 @@ Api.prototype.getUrlParameters = function (_84) {
     var _85 = this.getPartnerUrlParameters(_84);
     _85.set("auth_token", AppGlobals.userAuthToken);
     _85.set("partner_id", AppGlobals.partnerId);
-    _85.set("user_id", AppGlobals.partnerId);
+    _85.set("user_id", AppGlobals.userId);
     return _85
 };
 

@@ -10,11 +10,27 @@ var PlaylistService = Class.create({
         // state
         this.running = false;
         this.playlistRequested = false;
+        this.stoppedForNetwork = false;
     },
 
     start: function() {
+        if (this.running) {
+            return;
+        }
+        this.stoppedForNetwork = false;
         this.serviceId = setInterval(this.run.bind(this), PlaylistService.INTERVAL);
         this.running = true;
+    },
+
+    // Called by DeviceService when the connection manager reports the internet
+    // is back. If we gave up because of a network outage, pick up where we left off.
+    networkAvailable: function() {
+        if (this.stoppedForNetwork && !this.running && this.station.started) {
+            this.log("network is back, restarting playlist service");
+            AppGlobals.networkErrorCount = 0;
+            Application.dismissError();
+            this.start();
+        }
     },
 
     stop: function() {
@@ -35,11 +51,23 @@ var PlaylistService = Class.create({
                 this.log("too many errors, stopping playlist service");
                 Util.showRetryMessage(AppConstants.MSG_NETWORK_ERROR_TITLE, AppConstants.MSG_NETWORK_ERROR, this.retryCallback);
                 this.stop();
+                this.stoppedForNetwork = true;
                 return;
             }
 
             if (!AppGlobals.isInternetAvailable) {
-				AppGlobals.networkErrorCount += .5;
+                // Only count an outage toward the error threshold when we actually
+                // need the network right now. A brief blip while a buffered track is
+                // still playing is harmless; counting it used to shut the service down
+                // within six seconds and leave nothing to advance the queue.
+                var current = this.station.getCurrentTrack();
+                var needsNetwork = this.station.playlist.length == 0 ||
+                                   current == null ||
+                                   current.hasCompleted() ||
+                                   !current.isPlayable();
+                if (needsNetwork) {
+                    AppGlobals.networkErrorCount += .5;
+                }
                 this.log("waiting on network");
                 return;
             }

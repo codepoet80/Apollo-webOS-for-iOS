@@ -26,7 +26,8 @@ var SkipLimitService = Class.create({
 
 	updateSkipQueue: function() {
 		var timeThreshold = new Date().getTime() - SkipLimitService.STATION_SKIP_WINDOW;
-		for (var i = 0; i < this.skippedTracks.length; ++i) {
+		// iterate backwards so splicing doesn't skip the following entry
+		for (var i = this.skippedTracks.length - 1; i >= 0; --i) {
 			var skipLimitObject = this.skippedTracks[i];
 			if (skipLimitObject['time'] <= timeThreshold) {
 				Util.log("aging out old track: " + skipLimitObject['name'] + " listened at: " + skipLimitObject['time']);

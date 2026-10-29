@@ -557,14 +557,24 @@ enyo.kind({
 		
 		/** Artist Bio **/
 		this.$.artistBioScroller.scrollIntoView(0,0);
-		this.$.artistBio.setContent("Loading...");
 		var url = this.trackData.artistExplorerUrl;
+		if ( url ) {
+			this.$.artistBio.setContent("Loading...");
 			url = url.replace(/\/xml\//, "/json/");
 			url = url.replace(/beta.savagebeast.com:7001/, AppConstants.PANDORA_URL);
 			var request = new Ajax.Request(url, {
 				method: AppGlobals.HTTP_GET_METHOD,
-				onSuccess: this.onArtistData.bind(this)
+				onSuccess: this.onArtistData.bind(this),
+				onFailure: this.onArtistData.bind(this)
 			});
+		}
+		else {
+			// no explorer URL for this track (audio ad, or API change); don't let
+			// a TypeError here abort the rest of the track-change handling
+			this.artistInfo.bio = AppConstants.MSG_NO_ARTIST_INFO;
+			this.artistInfo.artUrl = AppConstants.defaultAlbumArt;
+			this.$.artistBio.setContent(AppConstants.MSG_NO_ARTIST_INFO);
+		}
 		
 		/** Track explanation **/
 		this.$.trackExplanationScroller.scrollIntoView(0,0);

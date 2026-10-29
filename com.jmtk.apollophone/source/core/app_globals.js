@@ -31,7 +31,9 @@ var AppGlobals = Class.create(Persistence, {
 		this.appHasFocus = true;
 		this.displayOn = true;
 
-		this.networkType = AppGlobals.NETWORK_WIFI;
+		// Constants live on the prototype; the AppGlobals global is still the
+		// constructor while this runs, so go through this.
+		this.networkType = this.NETWORK_WIFI;
 		this.isInternetAvailable = true;
 		this.trackCounter = 1000;
 		this.checkNetworkId = null;
@@ -73,10 +75,8 @@ var AppGlobals = Class.create(Persistence, {
 		this.dashProgress = true;
 		this.deviceInfo = enyo.fetchDeviceInfo();
 		this.controlsDisabled = true;
-		this.villoUsername = null;
 		this.simpleExhibition = true;
-		this.devStatistics = false;
-		
+
 		Util.log("AppGlobals Initialized");
 	},
 
@@ -120,11 +120,17 @@ var AppGlobals = Class.create(Persistence, {
 	},
 	
 	sortAlpha: function(a,b){
-
+		// QuickMix always sorts first; handle both sides so the comparator is consistent
+		if (a.isQuickMix && b.isQuickMix) {
+			return 0;
+		}
 		if (a.isQuickMix) {
 			return -1;
 		}
-		
+		if (b.isQuickMix) {
+			return 1;
+		}
+
 		if (a.stationName.toLowerCase() > b.stationName.toLowerCase()) {
 			return 1;
 		}
@@ -137,10 +143,16 @@ var AppGlobals = Class.create(Persistence, {
 	},
 	
 	sortDate: function(a,b){
+		if (a.isQuickMix && b.isQuickMix) {
+			return 0;
+		}
 		if (a.isQuickMix) {
 			return -1;
 		}
-	
+		if (b.isQuickMix) {
+			return 1;
+		}
+
 		if (a.dateCreated.time < b.dateCreated.time) {
 			return 1;
 		}
@@ -258,11 +270,6 @@ var AppGlobals = Class.create(Persistence, {
 		this.persistValue(AppGlobals.DB_KEY_EXHIBITION, value);
 	},
 	
-	setStatistics: function(value) {
-		this.devStatistics = value;
-		this.persistValue(AppGlobals.DB_KEY_STATISTICS, value);
-	},
-
     setLicensing: function(value) {
         this.licensing = value;
         this.persistValue(AppGlobals.DB_KEY_LICENSING, value);
@@ -285,7 +292,9 @@ var AppGlobals = Class.create(Persistence, {
 			this.station.stop();
 		}
 
-		DeviceService.stop();
+		if (DeviceService) {
+			DeviceService.stop();
+		}
 	}
 
 });
@@ -318,7 +327,6 @@ AppGlobals.prototype.DB_KEY_BACKGROUND_URL = "background-url";
 AppGlobals.prototype.DB_KEY_TEXT_BACKING = "text-backing";
 AppGlobals.prototype.DB_KEY_ORIENTATION = "orientation";
 AppGlobals.prototype.DB_KEY_EXHIBITION = "exhibition";
-AppGlobals.prototype.DB_KEY_STATISTICS = "statistics";
 AppGlobals.prototype.DB_KEY_AUTO_PLAY = "autoPlay";
 AppGlobals.prototype.DB_KEY_DASH_PROGRESS = "dashProgress";
 AppGlobals.prototype.DB_KEY_DEBUG = "debug";

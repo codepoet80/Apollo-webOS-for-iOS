@@ -110,8 +110,10 @@ enyo.kind({
 	},
 	clickHandler: function(inSender, inEvent) {
 		if (!this.disabled) {
-			this.doClick(inEvent);
-			this.openPopup(inEvent);
+			// An owner whose onclick handles the tap (returns true) replaces the popup.
+			if (!this.doClick(inEvent)) {
+				this.openPopup(inEvent);
+			}
 		}
 	},
 	resizeHandler: function() {

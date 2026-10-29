@@ -10,14 +10,17 @@ var DisassociateDeviceDelegate = Class.create(BaseDelegate, {
         if (AppGlobals.station != null) {
             AppGlobals.station.stop();
         }
-		
-		AppGlobals.removeAll();
-		
+
         MessageDispatcher.dispatchMessage(AppConstants.EVENT_ON_SIGN_OUT, true);
-		
+
 		// Necessary for restarting interface
 		AppGlobals.resetForSignOut();
-		AppGlobals.restore();
 		MessageDispatcher.initialize();
+
+		// Only re-read persisted state once the store has actually been cleared;
+		// the Depot is asynchronous, so restoring immediately could read stale values.
+		AppGlobals.removeAll(function() {
+			AppGlobals.restore();
+		});
     }
 });

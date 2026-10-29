@@ -16,8 +16,14 @@ enyo.kind({
 			service: "palm://com.palm.power/timeout/",
 			method: "set",
 			onSuccess: "setAlarmSuccess",
-			onFailure: "setAlarmFailure",
-			subscribe: true
+			onFailure: "setAlarmFailure"
+		},
+		{
+			name: "alarmClear",
+			kind: "PalmService",
+			service: "palm://com.palm.power/timeout/",
+			method: "clear",
+			onFailure: "setAlarmFailure"
 		},
 		// Preferences
 		{kind:"Scroller", height:"100%", components:[
@@ -99,13 +105,6 @@ enyo.kind({
 						// {kind:"RadioGroup", width:"190px", name:"exhibitionPreference", onChange:"exhibitionPreferenceChanged", components:[{caption:"Simple"}, {caption:"Full"}]},
 					// ]
 				// },
-				{kind:"HFlexBox", align:"center", height:"70px",
-					components:[
-						{content:"Send statistics to developer", className:"settingsHelpFont"},
-						{flex:1},
-						{kind:"CheckBox", name:"villoStatus", onChange:"villoCheckboxChanged"},
-					]
-				}
 			 ]
 			}
 		]
@@ -139,24 +138,6 @@ enyo.kind({
 			]
 		},
 		
-		{kind:"Popup", name:"villoPopup", scrim:true, dismissWithClick: false, dismissWithEscape: false,
-		 layoutKind:"VFlexLayout", width:"545px", height:"500px",
-			components:[
-				{kind:"HFlexBox", align:"center", components:[
-					{kind:"Image", src:"images/villo.png"},
-					{content:"&nbsp;Villo Enabled", style:"font-size:24px;"}
-					]
-				},
-				{kind:"HtmlContent", srcId:"villoInfo", onLinkClick:"openVilloWebsite"},
-				{flex:1},
-				{content:"Are you sure you want to enable statistics?"},
-				{kind:"HFlexBox", pack:"center", align:"center", components:[
-					{kind:"Button", content:"Yes", width:"65px", onclick:"enableStatistics", className:"enyo-button-affirmative"},
-					{kind:"Button", content:"No", width:"65px", onclick:"disableStatistics", className:"enyo-button-negative"}
-					]
-				}
-			]
-		},
 		{name: "launchApplicationService", kind: enyo.PalmService, service: enyo.palmServices.application, method: "open"}
 		
 	],
@@ -171,7 +152,6 @@ enyo.kind({
 		this.$.orientationToggle.setState( AppGlobals.orientation );
 		this.$.autoPlayToggle.setState( AppGlobals.startupAutoPlay );
 		//this.$.textBackingToggle.setState( AppGlobals.textBacking );
-		this.$.villoStatus.setChecked( AppGlobals.devStatistics );
 	//	if (AppGlobals.simpleExhibition) {this.$.exhibitionPreference.setValue(0)} else {this.$.exhibitionPreference.setValue(1)}
 		// this.$.dashProgressToggle.setState( AppGlobals.dashProgress );
 		
@@ -180,37 +160,6 @@ enyo.kind({
 	
 	audioSliderChange: function(inSender, inEvent) {
 		AppGlobals.setAudioQuality( inEvent );
-	},
-	
-	villoCheckboxChanged: function(inSender) {
-		if (inSender.getChecked()) {
-			this.$.villoStatus.setChecked(false);
-			this.$.villoPopup.openAtCenter();
-		} else {
-			//Turn off Villo statistics
-			AppGlobals.setStatistics(false);
-		}
-	},
-	
-	enableStatistics: function(inSender) {
-		this.$.villoStatus.setChecked(true);
-		//Turn on Villo Statistics
-		AppGlobals.setStatistics(true);
-		this.$.villoPopup.close();
-	},
-	
-	disableStatistics: function(inSender) {
-		this.$.villoStatus.setChecked(false);
-		//Turn off Villo statistics
-		AppGlobals.setStatistics(false);
-		this.$.villoPopup.close();
-	},
-	
-	openVilloWebsite: function(inSender, inUrl) {
-		var params = {
-			target: inUrl
-		};
-		this.$.launchApplicationService.call({id: "com.palm.app.browser", params: params});
 	},
 	
 	// exhibitionPreferenceChanged: function(inSender) {
@@ -264,8 +213,10 @@ enyo.kind({
 	itemChanged: function(inSender, inValue, inOldValue) {
 		var inTimeStr = "";
 		if (inValue == 0) {
-			//turn off
+			//turn off: cancel any alarm already scheduled with the system
 			this.millis = -1;
+			this.timeOfClick = -1;
+			this.$.alarmClear.call({ key: settings.ALARM_KEY });
 			return;
 		}
 		else if (inValue == 1) {
@@ -293,10 +244,11 @@ enyo.kind({
 			this.millis = 6 * 60 * 60 * 1000;
 			inTimeStr = "06:00:00";
 		}
-		//enyo.job( "closeWindow", enyo.bind( this, "initiateShutdown" ), this.millis);
+		// there is no "update" for system alarms: clear any existing one before setting
+		this.$.alarmClear.call({ key: settings.ALARM_KEY });
 		this.$.alarm.call({
 			wakeup: true,
-			key: "com.jmtk.apollo.timer",
+			key: settings.ALARM_KEY,
 			uri: "palm://com.palm.applicationManager/launch",
 			params: {
 				id: "com.jmtk.apollophone",
@@ -321,7 +273,7 @@ enyo.kind({
 		if (this.millis==-1) {
 			return;
 		}
-		timeLeftUntilClose=(this.millis - (new Date().getTime() - this.timeOfClick))/60000; //[min]
+		var timeLeftUntilClose=(this.millis - (new Date().getTime() - this.timeOfClick))/60000; //[min]
 		timeLeftUntilClose=Math.ceil(timeLeftUntilClose);
 		if ( timeLeftUntilClose >= 60 ) {
 			timeLeftUntilClose=timeLeftUntilClose/60; //[hr]
@@ -332,13 +284,15 @@ enyo.kind({
 		}
 	},
 
-	// See if we need to shutdown each time track changes
+	// Backstop for the system alarm: see if we need to shutdown each time track changes
 	initiateShutdown: function() {
 		if ( this.timeOfClick != -1 && this.millis != -1 && (new Date().getTime() - this.timeOfClick) >= this.millis ) {
 			this.log();
-			MessageDispatcher.dispatchMessage( AppConstants.EVENT_ON_SHUTDOWN, true );
+			Application.shutdown();
 		}
 	}
-	
+
 
 });
+
+settings.ALARM_KEY = "com.jmtk.apollo.timer";

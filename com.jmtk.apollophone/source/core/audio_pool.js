@@ -11,14 +11,22 @@ var AudioPool = {
 
         while ((idx != AudioPool._list.length) && (!found)) {
             Util.log("LOOP: audioPool.getInstance()");
-            if (AudioPool._list[idx].isFree && !AudioPool._list[idx].audio.broken) {
-                found = true;
-                AudioPool._list[idx].isFree = false;
-                AudioPool._list[idx].soundComponent = soundComponent;
-                retVal = AudioPool._list[idx].audio;
-                if (retVal.broken) {
-                    continue;
+            var entry = AudioPool._list[idx];
+            if (entry.isFree && entry.audio.broken) {
+                // a free-but-broken element will never be reused; drop it so it
+                // doesn't accumulate in the pool (and the DOM) forever
+                Util.log("POOL: discarding broken audio element");
+                if (entry.soundComponent) {
+                    entry.soundComponent.destroy();
                 }
+                AudioPool._list.splice(idx, 1);
+                continue;
+            }
+            if (entry.isFree) {
+                found = true;
+                entry.isFree = false;
+                entry.soundComponent = soundComponent;
+                retVal = entry.audio;
                 retVal.recycled = true;
                 Util.log("POOL: recycled");
             }
@@ -40,7 +48,7 @@ var AudioPool = {
 				if ( AppGlobals.platform == "device" ) {
 					aClass = 'media';
 				}
-				soundComponent = enyo.create( { kind: "customSound", audioClass: aClass, preload: false } );
+				soundComponent = enyo.create( { kind: "Sound", audioClass: aClass, preload: false } );
 				//enyo.log(soundComponent);
                 // document.body.appendChild(audio);
 				Application.addSound( soundComponent );
