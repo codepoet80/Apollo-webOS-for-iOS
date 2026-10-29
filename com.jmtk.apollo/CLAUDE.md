@@ -1,8 +1,8 @@
 # Apollo (com.jmtk.apollo)
 
-Third-party Pandora client for the HP TouchPad, written in 2012 on **Enyo 1** (webOS 3.x). It is a port of Palm's original Mojo Pandora app: `source/core/` is the Palm playback/API engine largely untouched, `source/*.js` is the Enyo UI layered on top. Current version 1.2.8, released to App Museum II (webOS Archive) on 2026-09-17.
+Third-party Pandora client for the HP TouchPad, written in 2012 on **Enyo 1** (webOS 3.x). It is a port of Palm's original Mojo Pandora app: `source/core/` is the Palm playback/API engine largely untouched, `source/*.js` is the Enyo UI layered on top. 1.2.8 was released to App Museum II (webOS Archive) on 2026-09-17; 1.2.9 (splash, now-playing info, skip-while-loading fix) is not released yet.
 
-Not a git repo. `CODE_REVIEW.md` holds the open review findings; its "Bugs" section is done, the platform and maintainability sections are still open.
+Lives in the Apollo-iOS git repository beside the phone app (`../com.jmtk.apollophone`) and the iOS app that hosts both; see `../README.md`. `CODE_REVIEW.md` holds the open review findings; its "Bugs" section is done, the platform and maintainability sections are still open.
 
 ## Platform constraints
 
