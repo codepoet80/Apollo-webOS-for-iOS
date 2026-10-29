@@ -1,0 +1,14 @@
+{
+	"title": 	  "Apollo",
+	"id": 		  "com.jmtk.apollo",
+	"version": 	  "1.2.8",
+	"vendor": 	  "JMTK",
+	"vendor_email": "enyopandora@gmail.com",
+	"vendor_url": "mailto:enyopandora@gmail.com",
+	"type": 	  "web",
+	"main": 	  "index.html",
+	"keywords": ["pandora", "music", "radio", "awesomeapps", "media", "pan", "apollo"],
+	"icon": 	  "icon.png",	
+	"dockMode": true,
+	"uiRevision": "2"
+}

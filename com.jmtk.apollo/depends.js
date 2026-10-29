@@ -1,0 +1,85 @@
+enyo.depends(
+	//External libs
+	"lib/prototype.js",
+	"lib/depot.js",
+	"lib/heartcode_canvas.js",
+	
+	// Below is all the original Pandora app code
+	
+    "source/core/util.js",
+    "source/core/persistence.js",
+    "source/core/app_globals.js",
+    "source/core/api_error.js",
+    "source/core/api.js",
+    "source/core/skip_limit_service.js",
+    "source/core/device_service.js",
+    "source/core/playlist_service.js",
+    "source/core/audio_pool.js",
+    "source/core/hashGen.js",
+  
+    
+  
+    "source/core/message_dispatcher.js",
+    "source/core/model/station.js",
+    "source/core/model/track.js",
+    "source/core/model/audio_ad.js",  
+    "source/core/model/artist_info.js",
+    "source/core/model/song_info.js",
+
+    "source/core/delegate/base_delegate.js",
+    "source/core/delegate/system_properties_delegate.js",
+    "source/core/delegate/check_licensing_delegate.js",
+    "source/core/delegate/partner_login_delegate.js",
+    "source/core/delegate/user_login_with_device_delegate.js",
+    "source/core/delegate/user_login_delegate.js",
+    "source/core/delegate/request_password_delegate.js",
+    "source/core/delegate/create_user_delegate.js",
+    "source/core/delegate/associate_device_delegate.js",
+    "source/core/delegate/disassociate_device_delegate.js",
+    "source/core/delegate/get_stationlist_checksum_delegate.js",
+    "source/core/delegate/get_stationlist_delegate.js",
+    "source/core/delegate/update_stationlist_delegate.js",
+    "source/core/delegate/get_playlist_delegate.js",
+    "source/core/delegate/get_ad_metadata_delegate.js",
+    "source/core/delegate/add_feedback_delegate.js",
+    "source/core/delegate/re_auth_partner_login_delegate.js",
+    "source/core/delegate/re_auth_device_login_delegate.js",
+    "source/core/delegate/create_station_delegate.js",
+    "source/core/delegate/delete_station_delegate.js",
+    "source/core/delegate/music_search_delegate.js",
+    "source/core/delegate/add_bookmark_delegate.js",
+    "source/core/delegate/sleep_song_delegate.js",
+    "source/core/delegate/sleep_song_with_skip_delegate.js",
+    "source/core/delegate/no_op_delegate.js",
+    "source/core/delegate/explain_track_delegate.js",
+    "source/core/delegate/share_station_delegate.js",
+    "source/core/delegate/upgrade_device_id_associate_delegate.js",
+    "source/core/delegate/upgrade_device_id_login_delegate.js",
+    "source/core/delegate/get_bookmarks_delegate.js",
+	"source/core/delegate/delete_bookmark_delegate.js",
+
+
+	"source/EnyoPandora.css",
+    "source/EnyoPandoraSplash.js",
+	"source/bookmarks.js",
+    "source/radioList.js",
+    "source/contentPage.js",
+    "source/EnyoPandoraInterface.js",
+    "source/EnyoPandora.js",
+    "source/settings.js",
+    "source/backgroundImagePicker.js",
+    "source/help.js",
+    "source/pullout.js",
+    "source/historyTile.js",
+    "source/MyDashboard.js",
+	"source/EnyoPandoraAlphaDiv.js",
+	"source/PrimaryInterface.js",
+	"source/exhibition.js",
+	"source/Grid.js",
+	"source/canvas.js",
+	"source/marqueeColumn.js",
+	"source/SearchInput.js"
+    
+	
+
+);

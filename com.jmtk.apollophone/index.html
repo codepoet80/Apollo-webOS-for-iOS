@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="height=device-height width=device-width initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>Pandora</title>
+<script src="/usr/palm/frameworks/enyo/1.0/framework/enyo.js" type="text/javascript"></script>
+<!--	<script src="/usr/palm/frameworks/enyo/1.0/framework/enyo.js" type="text/javascript"></script>-->
+	<script type="text/javascript" src="lib/villo.js"></script>
+	<script type="text/javascript" src="lib/info.villo.js"></script>
+</head>
+<body>
+
+<script type="text/javascript">
+	// initialize singletons
+	var AppGlobals = new AppGlobals();
+	/** Comment the line below to disable logging **/
+	AppGlobals.debug = true;
+	var Api = new Api();
+	var MessageDispatcher = new MessageDispatcher();
+
+//	enyo.log("Platform: "+AppGlobals.platform);
+	var DeviceService;
+	if ( AppGlobals.platform == "device" ) {
+//		enyo.log("DeviceService being made");
+		DeviceService = new DeviceServiceKind();
+//		DeviceService.hijackVolumeControls();
+	}
+
+	enyo.keyboard.setResizesWindow(true);
+	var Application = new EnyoPandora();
+	Application.renderInto( document.body );
+	Application.setView( "splash" );
+	
+</script>
+
+<div id="HTMLRefs" style="visibility: hidden;">
+	<div id="baneOfExistence">
+		<font style="font-size:16px">&nbsp;</font>
+	</div>
+	<div id="villoInfo">
+		<p style="font-size:14.5px">
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Villo Services is a collection of add-on services for new or existing mobile applications. 
+		These services allow mobile applications to get tapped into the Cloud with new and enhanced functionality. This allows us to retrieve information about how you use Apollo
+		so that we can better understand end-user usage. 
+		
+		<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NO PANDORA USER INFORMATION IS SENT TO US. We do not receive e-mail addresses, passwords, or any other information regarding 
+		your Pandora account. All information sent is regarding information such as user preferences, etc. This is completely optional. We do value your feedback and time.
+		<br><br>Thank you, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jake Morrison & Taylor Kimmett<br> 
+		<font size="4px"><div align="bottom"><div align="right">For more information, visit <a href="http://www.villo.net">Villo.net</a></div></div></font>
+		</p>
+	</div>
+
+	<div id="faq">
+		<font size="7px"><b><u>F.A.Q.</u></b></font>
+		<font size="5px">
+		<p>
+			<b>Is this an official app made by Pandora?</b><br>
+			No, it was developed by Taylor Kimmett and Jacob Morrison based strictly off of Pandora's official webOS phone version.
+		</p>
+		<p>
+			<b>Why does content take a while to load sometimes(song information, art, etc.)?</b><br>
+			That's completely Pandora's servers, or your internet connection, not the application, however we will do the best that we can to optimize load times.
+		</p>
+		<p>
+			<b>How do I delete a station?</b><br>
+			In the drop-down list, swipe to delete the station of your choosing.
+		</p>
+		<p>
+			<b>How do I add variety/rename a station?</b><br>
+			Due to the fact that we are using the same Pandora API from the original phone application, we do not have access to these features. If we could get access
+			or if Pandora were to update their API, be sure that we would add it.
+		</p>
+		<p>
+			<b>How do I search for a genre?</b><br>
+			Due to the fact that we are using the same Pandora API from the original phone application, we do not have access to these features. If we could get access
+			or if Pandora were to update their API, be sure that we would add it.
+		</p>
+		<p>
+			<b>Will my actions in the app be reflected on the Pandora website?</b><br>
+			Yes, all song likes/dislikes, new radios, and bookmark information is stored on Pandora's servers, not locally.
+		</p>
+		<p>
+			<b>Visit the following link for more information:</b><br>
+			<a href="http://forums.webosnation.com/webos-development/313785-enyo-pandora-hp-touchpad.html#post3314574" style="text-decoration:none;"><font color="#5c8cbc"><u>Apollo webOS Nation Forum Thread</u></font></a>
+		</p>
+		<p>
+			<font size="3px">
+			Pandora<sup>&#174;</sup> is a registered trademark. &#169; 2005-<script type="text/javascript">document.write(new Date().getFullYear())</script> Pandora Media Inc., All Rights Reserved. 
+			<br><br>
+			We make no claim to owning rights to services provided by Pandora Media Inc.
+			<br><br>
+			Pandora and the Music Genome Project are registered trademarks of Pandora Media, Inc.
+			</font>
+		</p>
+		
+		</font>
+	</div>
+	
+	<div id="changelog">
+	<font size="4px">
+		Interested in having the latest beta version of Apollo,
+		and want to have the newest features first? Go to 'Help' and use one of the developer contact options to be involved.
+		<hr>
+		<br>
+		<b>GESTURE LIST:</b><br>
+		Pause - Tap album art<br>
+		Skip - Swipe finger left<br>
+		History of songs - Swipe finger right<br>
+		Like song - Swipe up<br>
+		Dislike song - Swipe down<br>
+		More options - Tap+Hold on album art<br>
+		<br>
+		<hr>
+		<br>
+		<b>v1.0.11</b><Br>
+		Bluetooth controls now work(may not stream in some cases)<br>
+		Fixed glitchy dashboard progress<br>
+		Popups for signup/register are now toasters<br>
+	
+		<br>
+		<hr>
+		<br>
+		
+		<b>v1.0.0 (Initial App Catalog release)</b>
+	</font>
+	</div>
+
+	<div id="welcomeinfo">
+		<font size="4.5px">
+			<center>
+				<h4>Welcome to "Apollo", a third-party Pandora Media services application built using the Enyo Javascript Framework.</h4> <br>
+				Here are a few steps to make sure you get the most out of the application.<br>
+			</center>
+			<UL>
+				<LI>To start listening to a radio station, select a station at the top, or search for one by just typing.</li>
+				<LI>To gain access to settings or help, tap the app menu.</li>
+				<LI>To delete a station, simply swipe it away.</li>
+				<LI>After you've listened to a song on a given station, you'll notice its album art gets placed in a grid, tap that album art for more information</li>
+			</UL>
+			<center>
+				Pandora<sup>&#174;</sup> is a registered trademark. &#169; 2005-<script type="text/javascript">document.write(new Date().getFullYear())</script> Pandora Media Inc., All Rights Reserved. 
+				<br>
+				We make no claim to owning rights to services provided by Pandora Media Inc.
+				<br>
+				Pandora and the Music Genome Project are registered trademarks of Pandora Media, Inc.
+			</center>
+		</font>
+		<br>
+	</div>
+</div>
+
+<div id="soundArea">
+ <!-- enyo.Sound component gets loaded into here -->
+</div>
+
+</body>
+</html>

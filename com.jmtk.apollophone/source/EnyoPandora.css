@@ -1,0 +1,133 @@
+.enyo-menuitem {
+}
+
+.enyo-menuitem-caption {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	font-size: 20px;
+	line-height: 35px;
+}
+
+.enyo-menuitem-icon {
+	padding: 2px 8px;
+}
+
+.enyo-menuitem-arrow.enyo-button-depressed,
+.enyo-menuitem-arrow.enyo-button-down {
+	background-position: 0px -24px;
+}
+
+.enyo-menuitem-arrow {
+	height: 24px;
+	width: 30px;
+	background: url(../images/menuitem-arrow.png) center 0px;
+	margin-right: -5px;
+}
+
+.enyo-menuitem.enyo-checked.custom-menucheckitem-caption, .enyo-menuitem.enyo-checked .custom-menucheckitem-caption {
+	background: url(../images/checkmark.png) center right no-repeat;
+}
+
+
+.custom-menucheckitem-caption {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	font-size: 19px;
+	line-height: 40px;
+	padding-right: 45px;
+}
+
+.enyo-listselector-arrow {
+	min-height: 34px;
+	width: 14px;
+	background: url(../images/menu-arrow.png) center right no-repeat;
+	background-size: 14px 10px;
+}
+
+.enyo-listselector-label {
+	margin: 1px 6px 0px 6px;
+	line-height: 34px;
+	font-size: 14px;
+	white-space: nowrap;
+}
+
+.enyo-listselector-item {
+	border: 0;
+	padding: 0;
+}
+
+.enyo-listselector-item > .custom-menucheckitem-caption {
+	padding-right: 2px;
+}
+
+.enyo-item > .enyo-listselector {
+	margin: -10px 0;
+	padding: 10px 0;
+}
+
+
+
+.alphaDivider{
+	background: url(../images/alpha-divider.png) left center repeat-x;
+	height: 25px;
+	line-height: 25px;
+	margin: 7px 0;
+}
+
+.alphaDivider-caption {
+	padding: 0 25px;
+	font-size: 10pt;
+	color: #EEEEEE;
+	/* override Onyx */
+	margin: 0;
+}
+
+.settingsHelpFont {
+	font-size:21px;
+}
+
+.historyGrid {
+	position:relative;
+}
+
+.historyGrid > * {
+	position:absolute;
+	-webkit-transition:all 490ms ease-out;
+}
+
+.grid-image {
+	height:174px;
+	width:174px;
+	z-index:0;
+}
+
+.custom-spinner-large {
+	width: 192px;
+	height: 192px;
+	-webkit-box-sizing: border-box;
+  
+	background-image: url(../images/spinner-large.png);
+}
+
+
+@-webkit-keyframes enyo-rotating-image-rotate {
+	0% { -webkit-transform: rotateZ(0deg);}
+	100% { -webkit-transform: rotateZ(359deg);}
+}
+.enyo-rotating-image {
+	-webkit-animation-name: enyo-rotating-image-rotate;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-duration: 2s;
+	-webkit-animation-timing-function: linear;
+	-webkit-perspective: 1000;
+	-webkit-backface-visibility: hidden;  
+	overflow: hidden;
+	-webkit-transform:translate3d(0,0,0);
+	/*background: -webkit-gradient(linear, left top, left bottom, from(#00ABEB), to(white), color-stop(0.5, white), color-stop(0.5, #6C0));*/
+	-webkit-background-origin: content-box;
+	-webkit-background-clip: border-box;
+
+}
+

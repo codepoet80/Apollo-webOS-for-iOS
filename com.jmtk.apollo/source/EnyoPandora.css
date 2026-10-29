@@ -1,0 +1,29 @@
+.alphaDivider{
+	background: url(../images/alpha-divider.png) left center repeat-x;
+	height: 25px;
+	line-height: 25px;
+	margin: 7px 0;
+}
+
+.alphaDivider-caption {
+	padding: 0 25px;
+	font-size: 10pt;
+	color: #EEEEEE;
+	/* override Onyx */
+	margin: 0;
+}
+
+.historyGrid {
+	position:relative;
+}
+
+.historyGrid > * {
+	position:absolute;
+	-webkit-transition:all 490ms ease-out;
+}
+
+.grid-image {
+	height:174px;
+	width:174px;
+	z-index:0;
+}

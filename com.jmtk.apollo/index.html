@@ -1,0 +1,204 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>Pandora</title>
+<script src="/usr/palm/frameworks/enyo/1.0/framework/enyo.js" type="text/javascript"></script>
+<!--	<script src="/usr/palm/frameworks/enyo/1.0/framework/enyo.js" type="text/javascript"></script>-->
+</head>
+<body>
+
+<script type="text/javascript">
+	// initialize singletons
+	var AppGlobals = new AppGlobals();
+	/** Comment the line below to disable logging **/
+	AppGlobals.debug = true;
+	var Api = new Api();
+	var MessageDispatcher = new MessageDispatcher();
+
+//	enyo.log("Platform: "+AppGlobals.platform);
+	var DeviceService;
+	if ( AppGlobals.platform == "device" ) {
+//		enyo.log("DeviceService being made");
+		DeviceService = new DeviceServiceKind();
+//		DeviceService.hijackVolumeControls();
+	}
+
+	enyo.keyboard.setResizesWindow(true);
+	var Application = new EnyoPandora();
+	Application.renderInto( document.body );
+	Application.setView( "splash" );
+	
+</script>
+
+<div id="HTMLRefs" style="visibility: hidden;">
+	<div id="baneOfExistence">
+		<font style="font-size:16px">&nbsp;</font>
+	</div>
+	<div id="faq">
+		<font size="6px"><b><u>F.A.Q.</u></b></font>
+		<font size="3px">
+		<p>
+			<b>Is this an official app made by Pandora?</b><br>
+			No, it was developed by Taylor Kimmett and Jacob Morrison based strictly off of Pandora's official webOS phone version.
+		</p>
+		<p>
+			<b>Why does content take a while to load sometimes(song information, art, etc.)?</b><br>
+			That's completely Pandora's servers, or your internet connection, not the application, however we will do the best that we can to optimize load times.
+		</p>
+		<p>
+			<b>How do I delete a station?</b><br>
+			Place your finger on the radio you want to delete and drag your finger across the screen, left or right, to bring up the 'Delete' dialog.
+		</p>
+		<p>
+			<b>How do I add variety/rename a station?</b><br>
+			Due to the fact that we are using the same Pandora API from the original phone application, we do not have access to these features. If we could get access
+			or if Pandora were to update their API, be sure that we would add it.
+		</p>
+		<p>
+			<b>How do I search for a genre?</b><br>
+			Due to the fact that we are using the same Pandora API from the original phone application, we do not have access to these features. If we could get access
+			or if Pandora were to update their API, be sure that we would add it.
+		</p>
+		<p>
+			<b>Will my actions in the app be reflected on the Pandora website?</b><br>
+			Yes, all song likes/dislikes, new radios, and bookmark information is stored on Pandora's servers, not locally.
+		</p>
+		<p>
+			<b>Why can't we have unlimited skips?</b><br>
+			Although it is very much possible for us to remove skips, we will <i>not</i> break Pandora's terms of service. Pandora makes it clear
+			that the skip limit is so they don't have to pay big money for licensing songs that you only listen to for 10 seconds. 
+			If you visit the discussion below, other people have third-party ways of making skips unlimited on Apollo and much more.
+		</p>
+		<p>
+			<b>Want more info, learn how to modify Apollo, and get user help? Visit the following:</b><br>
+			<a href="http://forums.webosnation.com/webos-development/313785-enyo-pandora-hp-touchpad.html#post3314574" style="text-decoration:none;"><font color="#5c8cbc"><u>Apollo webOS Nation Forum Thread</u></font></a>
+		</p>
+		<p>
+			<font size="2px">
+			Pandora<sup>&#174;</sup> is a registered trademark. &#169; 2005-<script type="text/javascript">document.write(new Date().getFullYear())</script> Pandora Media Inc., All Rights Reserved. 
+			<br><br>
+			We make no claim to owning rights to services provided by Pandora Media Inc.
+			<br><br>
+			Pandora and the Music Genome Project are registered trademarks of Pandora Media, Inc.
+			</font>
+		</p>
+		
+		</font>
+	</div>
+	
+	<div id="changelog">
+	<font size="3px">
+		Interested in having the latest beta version of Apollo,
+		and want to have the newest features first? Go to 'Help' and use one of the developer contact options to be involved.
+		<hr>
+		<br>
+		<b>v1.2.8</b><Br>
+		Fixed playback pausing at the start of every other song<br>
+		A brief network drop no longer stops playback at the end of the song<br>
+		App Timeout "Off" now cancels the timer<br>
+		Removed Villo statistics<br>
+		Assorted bug fixes<br>
+
+		<br>
+		<hr>
+		<br>
+		<b>v1.2.6</b><Br>
+		Fixed glitchy dashboard progress<br>
+		Register popup was wrong size<br>
+		Welcome message displays on register<br>
+	
+		<br>
+		<hr>
+		<br>
+		
+		<b>v1.2.5</b><Br>
+		Made text/images bigger in bookmarks<br>
+		Modified statistics<br>
+		Fixed bug with pause icon showing up in exhibition when not paused<br>
+		Now pauses music when headphones are unplugged<br>
+		
+		<br>
+		<hr>
+		<br>
+		
+		<b>v1.2.2</b><br>
+		Changelog in app<br>		
+		Settings<br>
+		---------<br>
+		<ul>
+		<li>Removed toggle song progress in dashboard </li>
+		<li>Added text backing option </li>
+		<li>Added custom background selection </li>
+		<li>Added Exhibition Mode Style </li>
+		<li>Added Villo Statistics</li>
+		</ul><br>
+		
+		Exhibition (Simple)<br>
+		---------------------- <br>
+		<ul>
+		<li>Swipe left on album art = Skip </li>
+		<li>Swipe right on album art = History album art grid</li>
+		<li>Tap on album art = Pause</li>
+		<li>Swipe up on album art = Like</li>
+		<li>Swipe down on album art = Dislike</li>
+		<li>Tap radio name at top for station list</li>
+		</ul>
+		Support option now in developer feedback <br>
+		Added donors list <br>
+		New spinner<br>
+		Spinner in radio search box<br>
+		Bug fixes<br>
+		
+		<br>
+		<hr>
+		<br>
+		<b>v1.0.1</b> <br>
+		Added donate option in help text <br>
+		Fixed apptimeout when app was not in focus <br> <br>
+		<hr>
+		<br>
+		<b>v1.0.0</b> <br>
+		Better scrolling animation on history tiles updated <br>
+		Fixed bug with App Timeout(try tapping that row to see how much time you have left until app closes) <br>
+		Sorts numbers by '#', not each number individually <br>
+		New logos in app to match icon <br> <br>
+		<hr>
+		<br>
+		<b>v0.9.1 (Initial App Catalog release)</b><br>
+	</font>
+	</div>
+
+	<div id="welcomeinfo">
+		<font size="4px">
+			<center>
+				<h3>Welcome to "Apollo", a third-party Pandora Media services application built using the Enyo Javascript Framework.</h3> <br>
+				Here are a few steps to make sure you get the most out of the application.<br>
+			</center>
+			<UL>
+				<LI>To start listening to a radio station, select a station on the left, or search for one using the search bar at the bottom left of the screen.</li>
+				<LI>To gain access to settings or help, tap the button at the top right corner of the screen.</li>
+				<LI>To dismiss the settings/help pane, place your finger on the grab button and swipe it to the right off the screen.</li>
+				<LI>After you've listened to a song on a given station, you'll notice its album art gets placed in a scroller at the top of the screen. Try tapping on that album art to see more information.</li>
+				<LI>To give feedback, go to the 'Help' section by tapping the button in the top right corner of the screen.</li>
+			</UL>
+			<br>
+			<center>
+				Pandora<sup>&#174;</sup> is a registered trademark. &#169; 2005-<script type="text/javascript">document.write(new Date().getFullYear())</script> Pandora Media Inc., All Rights Reserved. 
+				<br>
+				We make no claim to owning rights to services provided by Pandora Media Inc.
+				<br>
+				Pandora and the Music Genome Project are registered trademarks of Pandora Media, Inc.
+			</center>
+		</font>
+		<br>
+	</div>
+</div>
+
+<div id="soundArea">
+ <!-- enyo.Sound component gets loaded into here -->
+</div>
+
+</body>
+</html>
