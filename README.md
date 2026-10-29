@@ -18,8 +18,8 @@ The webOS apps are changed only as webOS releases (bump `appinfo.json`, add to t
 
 ## Building
 
-Beside this folder: a [Lunacy](https://github.com/webOSArchive/Lunacy) checkout on its
-`ios-host` branch (LunaKit is `Lunacy/iOSLuna`, and its shared scripts are Lunacy's) and a
+Beside this folder: a [Lunacy](https://github.com/webOSArchive/Lunacy) checkout (LunaKit is
+`Lunacy/iOSLuna`, and its shared scripts are Lunacy's) and a
 [webos-sdk-redux](https://github.com/webOSArchive/webos-sdk-redux) clone (Enyo).
 
 ```sh
