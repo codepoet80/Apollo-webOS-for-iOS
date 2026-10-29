@@ -4,11 +4,11 @@ enyo.kind({
 	kind: enyo.HFlexBox,
 	align: "center",
 	pack: "center",
-	style:"background-image:url('themes/1.png'); background-repeat:no-repeat; background-color:#071228; background-position:center top",
+	style:"background-image:url('themes/1.png'); background-repeat:no-repeat; background-color:#071228; background-position:center top; background-size:cover",
 	components: [
-		{flex:1},
-		{ kind: enyo.Image, src: "images/logo.png", style:"padding-top: 300px;"},
-		{flex:1},
+		// The logo as a centred background, scaled down to fit a narrow screen: an <img> between
+		// flexed spacers came out left of centre once it was narrower than its natural 475 px.
+		{flex:1, style:"height: 148px; padding-top: 300px; margin: 0 5%; background: url('images/logo.png') no-repeat center; background-size: contain; background-origin: content-box;"},
 		{
             name : "getSysProp",
             kind : "PalmService",

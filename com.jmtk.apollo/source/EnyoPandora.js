@@ -16,6 +16,7 @@ enyo.kind({
 	create: function() {
 		this.inherited(arguments);
 		enyo.windows.renameWindow( window, "MainWindow" );
+		NowPlaying.start();
 		this.exhibition = false;
 		this.exhibitionLaunch = false;
 		if ( enyo.windowParams.windowType == "dockModeWindow" && enyo.windowParams.dockMode ) {

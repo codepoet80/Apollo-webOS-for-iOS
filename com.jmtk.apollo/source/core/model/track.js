@@ -179,6 +179,12 @@ var Track = Class.create({
 
     validateAudioUrlCallback: function(status, contentLength, audioUrl) {
         Util.log("audio url head status: " + status);
+        if (this.stopped) {
+            // Skipped or stopped while its URL was being checked: the audio element now belongs
+            // to another track, and setting its src would cut that track off.
+            this.log("ignoring audio url check for a stopped track");
+            return;
+        }
         this.contentLength = contentLength;
 
         if (status == 200 || status == 206) {
@@ -218,6 +224,10 @@ var Track = Class.create({
         }
 
         MessageDispatcher.dispatchMessage(AppConstants.EVENT_ON_DISABLE_CONTROLS, true);
+
+        // A HEAD request still in flight must not hand this track's audio to the pool's element
+        // after it has gone to the next track (validateAudioUrlCallback checks this).
+        this.stopped = true;
 
         if (this.monitorId != null) {
             clearInterval(this.monitorId);

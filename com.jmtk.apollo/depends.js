@@ -22,6 +22,7 @@ enyo.depends(
     "source/core/message_dispatcher.js",
     "source/core/model/station.js",
     "source/core/model/track.js",
+    "source/core/now_playing.js",
     "source/core/model/audio_ad.js",  
     "source/core/model/artist_info.js",
     "source/core/model/song_info.js",
